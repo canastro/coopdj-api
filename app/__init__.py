@@ -33,18 +33,6 @@ api = Api(app)
 api.add_resource(Musics, '/musics')
 api.add_resource(Music, '/musics/<int:music_id>')
 
-# app = Flask(__name__)
-#
-#
-# # Load default config and override config from an environment variable
-# app.config.update(dict(
-#     MONGODB_SETTINGS={'DB': "coopdj"},
-#     DEBUG=True,
-#     SECRET_KEY='secret'
-# ))
-#
-# db.init_app(app)
-
 # Add CORS
 @app.after_request
 def after_request(response):
@@ -52,9 +40,6 @@ def after_request(response):
   response.headers.add('Access-Control-Allow-Headers', 'Content-Type,Authorization')
   response.headers.add('Access-Control-Allow-Methods', 'GET,PUT,POST,DELETE')
   return response
-
-
-
 
 if __name__ == '__main__':
     app.run()
