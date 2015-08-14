@@ -5,7 +5,7 @@ from flask import Flask, Response, json
 from flask.ext.mongoengine import MongoEngine
 from flask_restful import reqparse, abort, Api, Resource, inputs
 
-from coopdj_api.models import MusicModel
+from app.models import MusicModel
 
 def buildResponse(data, status):
     return Response(json.dumps(data), status=status, mimetype='application/json')
