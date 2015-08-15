@@ -31,10 +31,10 @@ class Musics(Resource):
 
         # get all musics
         def getAll():
-            return buildResponse(MusicModel.objects.all().order_by('-votes'), 200)
+            return buildResponse(MusicModel.objects.all().order_by('-votes' ,'_id'), 200)
 
         def getNext():
-            music = MusicModel.objects(has_played=False).order_by('-votes').first()
+            music = MusicModel.objects(has_played=False).order_by('-votes','_id').first()
             return buildResponse(music, 200)
 
         options = {

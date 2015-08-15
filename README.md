@@ -14,3 +14,5 @@ and flask-restful.
  - http://docs.mongoengine.org/
  - https://flask-restful.readthedocs.org/en/0.3.4/quickstart.html#full-example
  - http://stackoverflow.com/questions/645312/what-is-the-quickest-way-to-http-get-in-python
+ - https://docs.python.org/2/library/unittest.html
+ - http://www.flaskapi.org/api-guide/status-codes/#client-error-4xx
