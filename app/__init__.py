@@ -3,7 +3,7 @@ import datetime
 from flask import Flask
 from flask.ext.mongoengine import MongoEngine
 from flask_restful import Api
-from app.resources.musics import Musics
+from app.resources.playlist import Playlist
 from app.resources.music import Music
 from app.models import db
 
@@ -20,7 +20,7 @@ api = Api(app)
 ##
 ## Actually setup the Api resource routing here
 ##
-api.add_resource(Musics, '/musics')
+api.add_resource(Playlist, '/playlist')
 api.add_resource(Music, '/musics/<int:music_id>')
 
 # Add CORS

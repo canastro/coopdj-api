@@ -5,17 +5,24 @@ from flask import Flask, Response, json
 from flask.ext.mongoengine import MongoEngine
 from flask_restful import reqparse, abort, Api, Resource, inputs
 
+from app import constants as CONSTANTS
 from app.models import MusicModel
 
 def buildResponse(data, status):
     return Response(json.dumps(data), status=status, mimetype='application/json')
 
-# Musics
+def buildYoutubeQueryURL(videoId):
+    url = CONSTANTS.YOUTUBE_API_BASE + CONSTANTS.YOUTUBE_API_VIDEO_DETAILS
+    url = url.replace('#VIDEO_ID#', videoId)
+
+    return url
+
+# Playlist
 # shows a list of all todos, and lets you POST to add new tasks
-class Musics(Resource):
+class Playlist(Resource):
     def __init__(self):
         self.parser = reqparse.RequestParser()
-        super(Musics, self).__init__()
+        super(Playlist, self).__init__()
 
     def get(self):
 
@@ -53,7 +60,7 @@ class Musics(Resource):
 
         self.parser.add_argument(
             'url',
-            type=inputs.regex('youtube\.com\/watch\?v=\w*'),
+            type=inputs.regex(CONSTANTS.YOUTUBE_URL_REGEX),
             help='Url is required',
             required=True
         )
@@ -68,20 +75,51 @@ class Musics(Resource):
 
         videoId = args['url'].split('watch?v=')[1]
 
-        #TODO: VALIDATE IF IS EMBBEDABLE
-        #https://www.googleapis.com/youtube/v3/videos?part=status&id=RsT3ttYbtr0&key={YOUR_API_KEY}
-        #http://stackoverflow.com/questions/645312/what-is-the-quickest-way-to-http-get-in-python
-        r = requests.get("https://www.googleapis.com/youtube/v3/videos?part=status&id=" + videoId + "&key=AIzaSyCyuznWcYDV_ORT9d1ONltKy5OL8S441wM")
+        r = requests.get(buildYoutubeQueryURL(videoId))
         response = r.json()
 
-        print response
+        if len(response['items']) == 0:
+            return buildResponse('Video not found', 404)
 
-        if not response['items'][0]['status']['embeddable']:
+        youtubeDetails = response['items'][0]
+
+        #At the time of this development the youtube API does not work properly to the embeddable property
+        if not youtubeDetails['status']['embeddable']:
             return buildResponse('Video is not embeddable', 400)
 
+        print youtubeDetails['snippet']['title']
+
         music = MusicModel()
+        music.title = youtubeDetails['snippet']['title']
+        music.description = youtubeDetails['snippet']['description']
+        music.channel_title = youtubeDetails['snippet']['channelTitle']
         music.type = args['type']
-        music.url = videoId
+        music.video_id = videoId
         music.save()
 
         return buildResponse('', 201)
+
+    def put(self):
+
+        self.parser.add_argument('action', help='Action is required', location='args')
+        args = self.parser.parse_args()
+
+        # get required action
+        action = args['action'].upper()
+
+        def reset():
+            musics = MusicModel.objects().update(has_played=False)
+
+        # switch
+        options = {
+            'RESET': reset
+        }
+
+        # if actions is not present in options object, then request was mal-formed
+        if not action in options:
+            return buildResponse('', 400)
+
+        # execute action and save music
+        options[action]()
+
+        return buildResponse('', 200)
