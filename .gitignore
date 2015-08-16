@@ -11,3 +11,4 @@ env
 # Python
 *.pyc
 tmp
+app_access_logs.log
