@@ -8,9 +8,7 @@ from flask_restful import Api
 from app.resources.playlist import Playlist
 from app.resources.music import Music
 from app.models import db
-
-LOG_FILENAME = 'app_access_logs.log'
-# https://github.com/MongoEngine/flask-mongoengine/issues/77
+from app import constants as CONSTANTS
 
 #Create our API
 app = Flask(__name__)
@@ -29,7 +27,6 @@ api.add_resource(Music, '/musics/<int:music_id>')
 
 # After request, add CORS and log requests
 def getResponseLen(response):
-
     try:
         return len(response.data)
     except:
@@ -62,8 +59,10 @@ def after_request(response):
 # Setup the database.
 def init(**config_overrides):
 
+    print "init------"
+
     handler = RotatingFileHandler(
-        LOG_FILENAME,
+        CONSTANTS.LOG_FILENAME,
         maxBytes=1024 * 1024 * 100,
         backupCount=20
     )
